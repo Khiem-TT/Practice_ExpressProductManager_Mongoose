@@ -20,8 +20,14 @@ class ProductController {
     }
     static async getListProduct(req, res) {
         try {
+            let page = +req.query.page;
+            page = page ? page : 1;
+            let limit = 2;
+            let offset = Math.ceil((page - 1) * limit);
             const products = await product_model_1.Product.find();
-            res.render('listProduct', { products: products });
+            const productLimit = await product_model_1.Product.find().limit(limit).skip(offset);
+            let totalPage = Math.ceil(products.length / limit);
+            res.render('listProduct', { productLimit: productLimit, numberPage: totalPage, currentPage: page });
         }
         catch (err) {
             res.render('error');

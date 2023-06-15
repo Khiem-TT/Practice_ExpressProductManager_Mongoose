@@ -17,8 +17,14 @@ export class ProductController {
 
     static async getListProduct(req, res) {
         try {
-            const products = await Product.find();
-            res.render('listProduct', {products: products});
+            let page = +req.query.page;
+            page = page ? page : 1;
+            let limit = 2;
+            let offset = Math.ceil((page - 1) * limit);
+            const products = await Product.find()
+            const productLimit = await Product.find().limit(limit).skip(offset);
+            let totalPage = Math.ceil(products.length / limit);
+            res.render('listProduct', {productLimit: productLimit, numberPage: totalPage, currentPage: page});
         } catch (err) {
             res.render('error');
         }
